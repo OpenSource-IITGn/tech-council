@@ -1,0 +1,47 @@
+{
+  "torque-2023": {
+    "id": "torque-2023",
+    "year": "2020-21",
+    "title": "Beatings the Blue",
+    "description": "Exploring the frontiers of AI, robotics, and sustainable technology",
+    "pages": 78,
+    "articles": 25,
+    "featured": "AI in Healthcare",
+    "filePath": "/torque/magazines/torque-2020-21-1748385860628-Torque3.pdf",
+    "fileName": "torque-2020-21-1748385860628-Torque3.pdf",
+    "fileSize": 29204718,
+    "isLatest": true,
+    "createdAt": "2023-12-01T00:00:00Z",
+    "updatedAt": "2025-05-27T22:44:20.722Z"
+  },
+  "torque-2022": {
+    "id": "torque-2022",
+    "year": "2018-19",
+    "title": "Vol. 1",
+    "description": "How technology is reshaping industries and society",
+    "pages": 42,
+    "articles": 22,
+    "featured": "Blockchain Revolution",
+    "filePath": "/torque/magazines/torque-2018-19-1748385997156-Torque1.pdf",
+    "fileName": "torque-2018-19-1748385997156-Torque1.pdf",
+    "fileSize": 6494984,
+    "isLatest": false,
+    "createdAt": "2022-12-01T00:00:00Z",
+    "updatedAt": "2025-05-27T22:46:37.255Z"
+  },
+  "torque-2021": {
+    "id": "torque-2021",
+    "year": "2019-20",
+    "title": "Neo Humans",
+    "description": "Student innovations and research breakthroughs",
+    "pages": 46,
+    "articles": 20,
+    "featured": "Quantum Computing",
+    "filePath": "/torque/magazines/torque-2019-20-1748385924505-Torque2.pdf",
+    "fileName": "torque-2019-20-1748385924505-Torque2.pdf",
+    "fileSize": 3389020,
+    "isLatest": false,
+    "createdAt": "2021-12-01T00:00:00Z",
+    "updatedAt": "2025-05-27T22:45:24.662Z"
+  }
+}
