@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AdminLayout } from "@/components/admin/admin-layout";
-import { Plus, Search, Edit, Trash2, Calendar, MapPin, Trophy, Medal, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Calendar, MapPin, Trophy, Medal, Loader2, AlertCircle, Eye } from "lucide-react";
 import { InterIITEvent } from "@/lib/inter-iit-data";
 
 export default function AdminInterIITPage() {
@@ -225,6 +225,14 @@ export default function AdminInterIITPage() {
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(`/achievements`, '_blank')}
+                          title="View achievements page"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"

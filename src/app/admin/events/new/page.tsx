@@ -19,6 +19,15 @@ import {
   Plus,
   Image as ImageIcon
 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/image-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { eventCategories, organizingBodies } from "@/lib/events-data";
 
 export default function NewEvent() {
   const { data: session, status } = useSession();
@@ -28,11 +37,20 @@ export default function NewEvent() {
     title: "",
     description: "",
     date: "",
-    category: "",
-    organizingBody: "",
     location: "",
-    draft: true,
-    gallery: [] as string[]
+    duration: "",
+    participants: "",
+    organizer: "",
+    category: "",
+    highlights: [] as string[],
+    gallery: [] as Array<{ id: string; url: string; alt: string; caption?: string }>,
+    draft: true
+  });
+  const [newHighlight, setNewHighlight] = useState("");
+  const [newGalleryItem, setNewGalleryItem] = useState({
+    url: "",
+    alt: "",
+    caption: ""
   });
 
   useEffect(() => {
@@ -48,18 +66,29 @@ export default function NewEvent() {
     e.preventDefault();
     setIsLoading(true);
 
-    console.log("Form submitted with data:", formData);
-
     try {
+      // Transform form data to match API expectations
+      const eventData = {
+        title: formData.title,
+        description: formData.description,
+        date: formData.date,
+        location: formData.location || "IITGN Campus",
+        duration: formData.duration || "1 day",
+        participants: formData.participants || "50+",
+        organizer: formData.organizer || "Technical Council",
+        category: formData.category,
+        highlights: formData.highlights.filter(h => h.trim() !== ""),
+        gallery: formData.gallery.filter(item => item.url && item.alt),
+        draft: formData.draft
+      };
+
       const response = await fetch("/api/admin/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(eventData),
       });
-
-      console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -68,7 +97,6 @@ export default function NewEvent() {
       }
 
       const result = await response.json();
-      console.log("Success result:", result);
       alert("Event created successfully!");
       router.push("/admin/events");
     } catch (err) {
@@ -86,17 +114,42 @@ export default function NewEvent() {
     }));
   };
 
-  const addGalleryImage = () => {
-    const url = prompt("Enter image URL:");
-    if (url) {
+  const addHighlight = () => {
+    if (newHighlight.trim()) {
       setFormData(prev => ({
         ...prev,
-        gallery: [...prev.gallery, url]
+        highlights: [...prev.highlights, newHighlight.trim()]
       }));
+      setNewHighlight("");
     }
   };
 
-  const removeGalleryImage = (index: number) => {
+  const removeHighlight = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: prev.highlights.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addGalleryItem = () => {
+    if (newGalleryItem.url.trim() && newGalleryItem.alt.trim()) {
+      const newItem = {
+        id: Date.now().toString(),
+        url: newGalleryItem.url.trim(),
+        alt: newGalleryItem.alt.trim(),
+        caption: newGalleryItem.caption.trim() || undefined
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        gallery: [...prev.gallery, newItem]
+      }));
+
+      setNewGalleryItem({ url: "", alt: "", caption: "" });
+    }
+  };
+
+  const removeGalleryItem = (index: number) => {
     setFormData(prev => ({
       ...prev,
       gallery: prev.gallery.filter((_, i) => i !== index)
@@ -236,39 +289,15 @@ export default function NewEvent() {
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <Label htmlFor="date">Event Date *</Label>
+                      <Label htmlFor="date">Date *</Label>
                       <Input
                         id="date"
-                        type="date"
                         value={formData.date}
                         onChange={(e) => handleInputChange("date", e.target.value)}
+                        placeholder="e.g., March 15-17, 2023"
                         required
                       />
                     </div>
-
-                    <div>
-                      <Label htmlFor="category">Category *</Label>
-                      <Input
-                        id="category"
-                        value={formData.category}
-                        onChange={(e) => handleInputChange("category", e.target.value)}
-                        placeholder="e.g., Workshop, Competition, Seminar"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <Label htmlFor="organizingBody">Organizing Body</Label>
-                      <Input
-                        id="organizingBody"
-                        value={formData.organizingBody}
-                        onChange={(e) => handleInputChange("organizingBody", e.target.value)}
-                        placeholder="e.g., Technical Council"
-                      />
-                    </div>
-
                     <div>
                       <Label htmlFor="location">Location</Label>
                       <Input
@@ -279,62 +308,194 @@ export default function NewEvent() {
                       />
                     </div>
                   </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor="duration">Duration</Label>
+                      <Input
+                        id="duration"
+                        value={formData.duration}
+                        onChange={(e) => handleInputChange("duration", e.target.value)}
+                        placeholder="e.g., 3 days"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="participants">Participants</Label>
+                      <Input
+                        id="participants"
+                        value={formData.participants}
+                        onChange={(e) => handleInputChange("participants", e.target.value)}
+                        placeholder="e.g., 500+"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor="organizer">Organizer *</Label>
+                      <Select
+                        value={formData.organizer}
+                        onValueChange={(value) => handleInputChange("organizer", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select organizer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {organizingBodies.map((body) => (
+                            <SelectItem key={body} value={body}>
+                              {body}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Category *</Label>
+                      <Select
+                        value={formData.category}
+                        onValueChange={(value) => handleInputChange("category", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {eventCategories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
-              {/* Gallery */}
+              {/* Highlights Section */}
               <Card className="glass">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ImageIcon className="h-5 w-5" />
-                    Photo Gallery
-                  </CardTitle>
+                  <CardTitle>Event Highlights</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    {formData.highlights.map((highlight, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={highlight}
+                          onChange={(e) => {
+                            const newHighlights = [...formData.highlights];
+                            newHighlights[index] = e.target.value;
+                            handleInputChange("highlights", newHighlights);
+                          }}
+                          placeholder="Enter highlight"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeHighlight(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newHighlight}
+                      onChange={(e) => setNewHighlight(e.target.value)}
+                      placeholder="Add new highlight"
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addHighlight();
+                        }
+                      }}
+                    />
+                    <Button type="button" onClick={addHighlight}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Gallery Section */}
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Event Gallery</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-6">
+                    {formData.gallery.map((item, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Image {index + 1}</h4>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeGalleryItem(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <ImageUpload
+                          label="Gallery Image"
+                          currentImageUrl={item.url}
+                          onImageUploaded={(url) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].url = url;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          onImageRemoved={() => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].url = "";
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          showAltText={true}
+                          altText={item.alt}
+                          onAltTextChange={(altText) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].alt = altText;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          showCaption={true}
+                          caption={item.caption || ""}
+                          onCaptionChange={(caption) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].caption = caption;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          required={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 space-y-4">
+                    <h4 className="font-medium">Add New Image</h4>
+                    <ImageUpload
+                      label="Upload New Gallery Image"
+                      currentImageUrl={newGalleryItem.url}
+                      onImageUploaded={(url) => setNewGalleryItem(prev => ({ ...prev, url }))}
+                      onImageRemoved={() => setNewGalleryItem(prev => ({ ...prev, url: "" }))}
+                      showAltText={true}
+                      altText={newGalleryItem.alt}
+                      onAltTextChange={(altText) => setNewGalleryItem(prev => ({ ...prev, alt: altText }))}
+                      showCaption={true}
+                      caption={newGalleryItem.caption}
+                      onCaptionChange={(caption) => setNewGalleryItem(prev => ({ ...prev, caption }))}
+                      required={true}
+                    />
                     <Button
                       type="button"
-                      variant="outline"
-                      onClick={addGalleryImage}
-                      className="w-full"
+                      onClick={addGalleryItem}
+                      disabled={!newGalleryItem.url || !newGalleryItem.alt}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Photo URL
+                      Add Image
                     </Button>
-
-                    {formData.gallery.length > 0 && (
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {formData.gallery.map((url, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={url}
-                              alt={`Gallery ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg"
-                              onError={(e) => {
-                                e.currentTarget.src = "/placeholder-image.jpg";
-                              }}
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => removeGalleryImage(index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {formData.gallery.length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>No photos added yet</p>
-                        <p className="text-sm">Add photo URLs to create a gallery</p>
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -20,7 +20,7 @@
     "gallery": [
       {
         "id": "1",
-        "url": "/events/placeholder-1.svg",
+        "url": "/events/uploads/1749143853632-0im1m8nn9155.jpg",
         "alt": "Tech Symposium 2023 - Main Stage",
         "caption": "Opening ceremony at the main auditorium"
       },
@@ -38,7 +38,7 @@
       }
     ],
     "createdAt": "2023-03-01T00:00:00Z",
-    "updatedAt": "2023-03-01T00:00:00Z"
+    "updatedAt": "2025-06-05T17:17:50.419Z"
   },
   "robotics-workshop-2023": {
     "id": "robotics-workshop-2023",
@@ -107,43 +107,5 @@
     ],
     "createdAt": "2023-11-01T00:00:00Z",
     "updatedAt": "2023-11-01T00:00:00Z"
-  },
-  "test-event-via-curl-445720": {
-    "title": "Test Event via Curl",
-    "description": "This is a test event created via curl",
-    "date": "2024-01-15",
-    "location": "IITGN Campus",
-    "duration": "1 day",
-    "participants": "50+",
-    "organizer": "Technical Council",
-    "category": "Workshop",
-    "highlights": [
-      "Engaging sessions and activities",
-      "Learning opportunities",
-      "Networking with peers"
-    ],
-    "gallery": [],
-    "id": "test-event-via-curl-445720",
-    "createdAt": "2025-05-27T01:47:25.720Z",
-    "updatedAt": "2025-05-27T01:47:25.720Z"
-  },
-  "test-event-711975": {
-    "title": "Test Event",
-    "description": "This is a test event created from the admin panel",
-    "date": "2024-01-15",
-    "location": "IITGN Campus",
-    "duration": "1 day",
-    "participants": "50+",
-    "organizer": "Technical Council",
-    "category": "tech",
-    "highlights": [
-      "Engaging sessions and activities",
-      "Learning opportunities",
-      "Networking with peers"
-    ],
-    "gallery": [],
-    "id": "test-event-711975",
-    "createdAt": "2025-05-27T01:51:51.975Z",
-    "updatedAt": "2025-05-27T01:51:51.975Z"
   }
 }

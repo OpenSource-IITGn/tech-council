@@ -15,6 +15,8 @@ const updateMagazineSchema = z.object({
   filePath: z.string().min(1).optional(),
   fileName: z.string().min(1).optional(),
   fileSize: z.number().min(1).optional(),
+  coverPhoto: z.string().nullable().optional(),
+  coverPhotoFileName: z.string().nullable().optional(),
   isLatest: z.boolean().optional()
 });
 

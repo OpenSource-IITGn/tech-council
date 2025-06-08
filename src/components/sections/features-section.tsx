@@ -1,9 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Link from "next/link"
 import { Code, Cpu, Rocket, Zap, Globe, Brain } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 const features = [
   {
@@ -73,34 +71,34 @@ export function FeaturesSection() {
   }, [])
 
   return (
-    <section className="py-24 bg-gray-50 dark:bg-gray-800/50" ref={sectionRef}>
-      <div className="container px-4 md:px-6">
+    <section className="section-padding bg-gray-50 dark:bg-gray-800/50" ref={sectionRef}>
+      <div className="container mobile-padding">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-space-grotesk">
+          <div className="space-y-3 sm:space-y-4">
+            <h2 className="responsive-text-2xl font-bold tracking-tighter font-space-grotesk">
               Why Choose Tech Council?
             </h2>
-            <p className="mx-auto max-w-[900px] text-gray-600 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="mx-auto max-w-[900px] responsive-text-base text-gray-600 dark:text-gray-400 leading-relaxed px-4 sm:px-0">
               We are the hub of technical innovation at IIT Gandhinagar, fostering creativity,
               collaboration, and cutting-edge research across multiple domains.
             </p>
           </div>
         </div>
 
-        <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 lg:gap-12">
+        <div className="mx-auto responsive-grid-1-2-3 max-w-5xl items-center gap-4 sm:gap-6 lg:gap-8 py-8 sm:py-12">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <div
                 key={index}
-                className="feature-card opacity-0 group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="feature-card opacity-0 group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 mobile-card transition-all duration-300 hover:scale-105 hover:shadow-lg touch-target"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-                  <Icon className={`h-6 w-6 ${feature.color}`} />
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${feature.color}`} />
                 </div>
-                <div className="space-y-2 mt-4">
-                  <h3 className="text-xl font-bold">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
+                <div className="space-y-2 mt-3 sm:mt-4">
+                  <h3 className="responsive-text-lg font-bold">{feature.title}</h3>
+                  <p className="responsive-text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{feature.description}</p>
                 </div>
 
                 {/* Hover effect overlay */}

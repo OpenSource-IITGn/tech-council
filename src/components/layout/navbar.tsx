@@ -65,7 +65,7 @@ export function Navbar() {
           <span className="sr-only">Toggle Menu</span>
         </Button>
 
-        {/* Mobile logo */}
+        {/* Mobile logo and theme toggle */}
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <Link href="/" className="flex items-center space-x-2 md:hidden">

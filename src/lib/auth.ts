@@ -1,11 +1,21 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { getAdminEmails } from "./admin-emails-storage";
 
-// List of authorized admin emails
-const ADMIN_EMAILS = [
-  "mukul.meena@iitgn.ac.in",
-  "technical.secretary@iitgn.ac.in",
-];
+// Get admin emails dynamically from storage
+async function getAuthorizedEmails(): Promise<string[]> {
+  try {
+    const adminEmails = await getAdminEmails();
+    return adminEmails.emails;
+  } catch (error) {
+    console.error("Error loading admin emails, using fallback:", error);
+    // Fallback to hardcoded emails if storage fails
+    return [
+      "mukul.meena@iitgn.ac.in",
+      "technical.secretary@iitgn.ac.in",
+    ];
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,7 +27,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       // Check if user email is in the admin list
-      if (user.email && ADMIN_EMAILS.includes(user.email)) {
+      const authorizedEmails = await getAuthorizedEmails();
+      if (user.email && authorizedEmails.includes(user.email)) {
         return true;
       }
 
@@ -26,14 +37,16 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session }) {
       // Add admin flag to session
-      if (session.user?.email && ADMIN_EMAILS.includes(session.user.email)) {
+      const authorizedEmails = await getAuthorizedEmails();
+      if (session.user?.email && authorizedEmails.includes(session.user.email)) {
         session.user.isAdmin = true;
       }
       return session;
     },
     async jwt({ token, user }) {
       // Add admin flag to token
-      if (user?.email && ADMIN_EMAILS.includes(user.email)) {
+      const authorizedEmails = await getAuthorizedEmails();
+      if (user?.email && authorizedEmails.includes(user.email)) {
         token.isAdmin = true;
       }
       return token;

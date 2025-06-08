@@ -18,9 +18,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  Filter,
-  Download,
-  Upload
+  Filter
 } from "lucide-react";
 
 export default function EventsManagement() {
@@ -128,20 +126,10 @@ export default function EventsManagement() {
               Create, edit, and manage events for your gallery
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => router.push('/admin/events/import')}>
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-            <Button variant="outline" onClick={() => window.open('/api/admin/events/export')}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button onClick={() => router.push('/admin/events/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Event
-            </Button>
-          </div>
+          <Button onClick={() => router.push('/admin/events/new')}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Event
+          </Button>
         </div>
 
         {/* Statistics */}
@@ -279,7 +267,8 @@ export default function EventsManagement() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push(`/events/${id}`)}
+                        onClick={() => window.open(`/achievements/events/${id}`, '_blank')}
+                        title="View public page"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>

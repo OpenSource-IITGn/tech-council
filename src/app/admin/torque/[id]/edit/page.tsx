@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Upload, FileText, Download, Star } from "lucide-react";
-import { TorqueMagazine, maxFileSize } from "@/lib/torque-data";
+import { ArrowLeft, Upload, FileText, Download, Star, Image, Trash2 } from "lucide-react";
+import { TorqueMagazine, maxFileSize, maxImageSize } from "@/lib/torque-data";
 
 export default function EditMagazinePage() {
   const router = useRouter();
@@ -30,6 +30,8 @@ export default function EditMagazinePage() {
     isLatest: false
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedCoverPhoto, setSelectedCoverPhoto] = useState<File | null>(null);
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
@@ -90,6 +92,33 @@ export default function EditMagazinePage() {
     }
   };
 
+  const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, or WebP).');
+        return;
+      }
+
+      // Validate file size
+      if (file.size > maxImageSize) {
+        alert(`Image size too large. Maximum size is ${maxImageSize / (1024 * 1024)}MB.`);
+        return;
+      }
+
+      setSelectedCoverPhoto(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setCoverPhotoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const uploadFile = async (file: File, year: string) => {
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
@@ -106,6 +135,50 @@ export default function EditMagazinePage() {
     }
 
     return response.json();
+  };
+
+  const uploadCoverPhoto = async (file: File, magazineId: string) => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('magazineId', magazineId);
+
+    const response = await fetch('/api/admin/torque/upload-cover', {
+      method: 'POST',
+      body: uploadFormData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to upload cover photo');
+    }
+
+    return response.json();
+  };
+
+  const deleteCoverPhoto = async () => {
+    try {
+      const response = await fetch(`/api/admin/torque/${magazineId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          coverPhoto: null,
+          coverPhotoFileName: null
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove cover photo");
+      }
+
+      // Update local state
+      setMagazine(prev => prev ? { ...prev, coverPhoto: undefined, coverPhotoFileName: undefined } : null);
+      alert("Cover photo removed successfully!");
+    } catch (error) {
+      console.error("Error removing cover photo:", error);
+      alert("Failed to remove cover photo");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,6 +223,31 @@ export default function EditMagazinePage() {
 
       if (!response.ok) {
         throw new Error("Failed to update magazine");
+      }
+
+      setUploadProgress(80);
+
+      // Upload cover photo if selected
+      if (selectedCoverPhoto) {
+        setUploadProgress(85);
+        const coverUploadResult = await uploadCoverPhoto(selectedCoverPhoto, magazineId);
+
+        // Update magazine with cover photo
+        const coverUpdateResponse = await fetch(`/api/admin/torque/${magazineId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            coverPhoto: coverUploadResult.filePath,
+            coverPhotoFileName: coverUploadResult.fileName
+          }),
+        });
+
+        if (!coverUpdateResponse.ok) {
+          console.warn("Failed to update magazine with cover photo");
+        }
+        setUploadProgress(95);
       }
 
       setUploadProgress(100);
@@ -283,6 +381,53 @@ export default function EditMagazinePage() {
           </CardContent>
         </Card>
 
+        {/* Current Cover Photo */}
+        <Card className="glass">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5" />
+              Cover Photo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {magazine.coverPhoto ? (
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="relative w-32 h-40 flex-shrink-0">
+                    <img
+                      src={magazine.coverPhoto}
+                      alt="Current cover photo"
+                      className="w-full h-full object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium">Current Cover Photo</p>
+                    <p className="text-sm text-muted-foreground">
+                      {magazine.coverPhotoFileName || 'cover-photo.jpg'}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={deleteCoverPhoto}
+                      className="mt-2"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remove Cover Photo
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                <Image className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground">No cover photo uploaded</p>
+                <p className="text-sm text-muted-foreground">Upload a cover photo to enhance the magazine display</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload (Optional) */}
           <Card className="glass">
@@ -330,6 +475,57 @@ export default function EditMagazinePage() {
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Cover Photo Upload */}
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="h-5 w-5" />
+                {magazine.coverPhoto ? 'Replace Cover Photo' : 'Upload Cover Photo'} (Optional)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="coverPhoto">Cover Photo</Label>
+                <Input
+                  id="coverPhoto"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleCoverPhotoChange}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Maximum file size: {formatFileSize(maxImageSize)}. Supported formats: JPEG, PNG, WebP.
+                </p>
+              </div>
+
+              {selectedCoverPhoto && (
+                <div className="space-y-3">
+                  <div className="p-3 bg-muted rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Image className="h-4 w-4" />
+                      <span className="text-sm font-medium">{selectedCoverPhoto.name}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Size: {formatFileSize(selectedCoverPhoto.size)}
+                    </p>
+                  </div>
+
+                  {coverPhotoPreview && (
+                    <div className="space-y-2">
+                      <Label>Preview:</Label>
+                      <div className="relative w-48 h-64 mx-auto">
+                        <img
+                          src={coverPhotoPreview}
+                          alt="Cover photo preview"
+                          className="w-full h-full object-cover rounded-lg shadow-md"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>

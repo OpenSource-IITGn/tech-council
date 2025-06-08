@@ -10,7 +10,7 @@
     "filePath": "/torque/magazines/torque-2020-21-1748385860628-Torque3.pdf",
     "fileName": "torque-2020-21-1748385860628-Torque3.pdf",
     "fileSize": 29204718,
-    "isLatest": true,
+    "isLatest": false,
     "createdAt": "2023-12-01T00:00:00Z",
     "updatedAt": "2025-05-27T22:44:20.722Z"
   },
@@ -43,5 +43,39 @@
     "isLatest": false,
     "createdAt": "2021-12-01T00:00:00Z",
     "updatedAt": "2025-05-27T22:45:24.662Z"
+  },
+  "torque-2025-aa": {
+    "year": "2025",
+    "title": "aa",
+    "description": "aa",
+    "pages": 111,
+    "articles": 11,
+    "featured": "AI in Healthcare",
+    "filePath": "/torque/magazines/torque-2025-1749336626700-Summer_Projects_2024.pdf",
+    "fileName": "torque-2025-1749336626700-Summer_Projects_2024.pdf",
+    "fileSize": 1026812,
+    "isLatest": true,
+    "id": "torque-2025-aa",
+    "createdAt": "2025-06-07T22:50:26.762Z",
+    "updatedAt": "2025-06-07T23:33:30.269Z",
+    "coverPhoto": "/torque/covers/torque-2025-aa-cover.png",
+    "coverPhotoFileName": "ChatGPT Image May 28, 2025, 10_30_52 PM.png"
+  },
+  "torque-2026-11": {
+    "year": "2026",
+    "title": "Innovation Unleashed",
+    "description": "Exploring the frontiers of AI, robotics, and sustainable technology in the modern era",
+    "pages": 221,
+    "articles": 22,
+    "featured": "AI in Healthcare",
+    "filePath": "/torque/magazines/torque-2026-1749337293307-Yearbook_2025.pdf",
+    "fileName": "torque-2026-1749337293307-Yearbook_2025.pdf",
+    "fileSize": 9169770,
+    "coverPhoto": "/torque/covers/torque-2026-11-cover.jpg",
+    "coverPhotoFileName": "MAPRC MAGZINE ISSUE 1.jpg",
+    "isLatest": false,
+    "id": "torque-2026-11",
+    "createdAt": "2025-06-07T23:01:33.629Z",
+    "updatedAt": "2025-06-07T23:33:27.095Z"
   }
 }

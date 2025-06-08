@@ -66,7 +66,7 @@ export default function CouncilMembersPage() {
               Council Members
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Meet the dedicated team members who drive innovation and excellence at IITB Tech Council
+              Meet the dedicated team members who drive innovation and excellence at IITGN Tech Council
             </p>
           </motion.div>
 
@@ -127,9 +127,9 @@ export default function CouncilMembersPage() {
                       <div className="space-y-2">
                         <a
                           href={`mailto:${member.email}`}
-                          className="inline-flex items-center text-xs text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                          className="inline-flex items-center text-xs text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
                         >
-                          {member.email}
+                          <span className="truncate">{member.email}</span>
                         </a>
                       </div>
                     </motion.div>

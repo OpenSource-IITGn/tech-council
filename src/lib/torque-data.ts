@@ -9,6 +9,8 @@ export interface TorqueMagazine {
   filePath: string;
   fileName: string;
   fileSize: number;
+  coverPhoto?: string; // Path to cover photo image
+  coverPhotoFileName?: string; // Original filename of cover photo
   isLatest: boolean;
   createdAt: string;
   updatedAt: string;
@@ -27,6 +29,8 @@ export const defaultTorqueData: Record<string, TorqueMagazine> = {
     filePath: "/torque/magazines/torque-2023.pdf",
     fileName: "torque-2023.pdf",
     fileSize: 15728640, // 15MB in bytes
+    coverPhoto: "/torque/covers/torque-2023-cover.jpg",
+    coverPhotoFileName: "torque-2023-cover.jpg",
     isLatest: true,
     createdAt: "2023-12-01T00:00:00Z",
     updatedAt: "2023-12-01T00:00:00Z"
@@ -83,5 +87,16 @@ export const allowedFileTypes = [
   'application/pdf'
 ];
 
+// Allowed image file types for cover photos
+export const allowedImageTypes = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp'
+];
+
 // Maximum file size (50MB in bytes)
 export const maxFileSize = 50 * 1024 * 1024;
+
+// Maximum image file size (10MB in bytes)
+export const maxImageSize = 10 * 1024 * 1024;

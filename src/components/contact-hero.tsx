@@ -2,7 +2,7 @@
 import React from "react";
 import { Boxes } from "@/components/ui/background-boxes";
 import { cn } from "@/lib/utils";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 export function ContactHero() {
   return (

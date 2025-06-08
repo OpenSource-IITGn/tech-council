@@ -1,17 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Metadata } from "next"
 import { Mail, Phone, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ContactHero } from "@/components/contact-hero"
 import { GoogleMaps } from "@/components/google-maps"
 import { FAQAccordion } from "@/components/faq-accordion"
-
-const metadata: Metadata = {
-  title: "Contact Us - Technical Council IITGN",
-  description: "Get in touch with the Technical Council of IIT Gandhinagar. Contact our secretary or send us a message.",
-}
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -20,14 +14,48 @@ export default function ContactPage() {
     subject: "",
     message: ""
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log("Form submitted:", formData)
-    // You would typically send this to your backend
-    alert("Thank you for your message! We'll get back to you soon.")
-    setFormData({ name: "", email: "", subject: "", message: "" })
+    setIsSubmitting(true)
+    setSubmitStatus({ type: null, message: '' })
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: 'success',
+          message: result.message || 'Thank you for your message! We\'ll get back to you soon.'
+        })
+        setFormData({ name: "", email: "", subject: "", message: "" })
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: result.error || 'Failed to send message. Please try again.'
+        })
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection and try again.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -121,9 +149,33 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full sm:w-auto">
-                  <Send className="mr-2 h-4 w-4" />
-                  Send Message
+                {/* Status Message */}
+                {submitStatus.type && (
+                  <div className={`p-4 rounded-md ${
+                    submitStatus.type === 'success'
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
+                  }`}>
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full sm:w-auto"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Send Message
+                    </>
+                  )}
                 </Button>
               </form>
             </div>

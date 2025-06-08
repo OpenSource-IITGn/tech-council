@@ -12,6 +12,7 @@ import { Trash2, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { hackathonCategories, hackathonStatuses, prizePositions, organizerRoles, sponsorTiers } from "@/lib/hackathons-data";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 interface Prize {
   position: string;
@@ -65,6 +66,12 @@ export default function NewHackathonPage() {
   const [requirements, setRequirements] = useState<string[]>([""]);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([{ time: "", activity: "", description: "", location: "" }]);
   const [sponsors, setSponsors] = useState<Sponsor[]>([{ name: "", tier: "", website: "" }]);
+  const [gallery, setGallery] = useState<Array<{ id: string; url: string; alt: string; caption?: string }>>([]);
+  const [newGalleryItem, setNewGalleryItem] = useState({
+    url: "",
+    alt: "",
+    caption: ""
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -150,6 +157,24 @@ export default function NewHackathonPage() {
     }
   };
 
+  const addGalleryItem = () => {
+    if (newGalleryItem.url.trim() && newGalleryItem.alt.trim()) {
+      const newItem = {
+        id: Date.now().toString(),
+        url: newGalleryItem.url.trim(),
+        alt: newGalleryItem.alt.trim(),
+        caption: newGalleryItem.caption.trim() || undefined
+      };
+
+      setGallery(prev => [...prev, newItem]);
+      setNewGalleryItem({ url: "", alt: "", caption: "" });
+    }
+  };
+
+  const removeGalleryItem = (index: number) => {
+    setGallery(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -196,7 +221,7 @@ export default function NewHackathonPage() {
         schedule: schedule.filter(s => s.time.trim() !== "" && s.activity.trim() !== ""),
         sponsors: sponsors.filter(s => s.name.trim() !== "" && s.tier.trim() !== ""),
         winners: [],
-        gallery: []
+        gallery: gallery
       };
 
       const response = await fetch("/api/admin/hackathons", {

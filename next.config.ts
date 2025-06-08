@@ -29,6 +29,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Production optimizations
+  serverExternalPackages: ['sharp'],
+  // Ensure static files are properly handled
+  trailingSlash: false,
+  // Optimize for production
+  compress: true,
+  poweredByHeader: false,
 };
 
 export default nextConfig;

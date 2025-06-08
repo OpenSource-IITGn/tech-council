@@ -12,7 +12,7 @@
     "isSecretary": true,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "anmol-kumar": {
     "id": "anmol-kumar",
@@ -27,7 +27,7 @@
     "isSecretary": false,
     "isCoordinator": true,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "naveen-pal": {
     "id": "naveen-pal",
@@ -42,7 +42,7 @@
     "isSecretary": false,
     "isCoordinator": true,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "ridham-patel": {
     "id": "ridham-patel",
@@ -57,7 +57,7 @@
     "isSecretary": false,
     "isCoordinator": true,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "kalp-shah": {
     "id": "kalp-shah",
@@ -72,7 +72,7 @@
     "isSecretary": false,
     "isCoordinator": true,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "mukul-meena": {
     "id": "mukul-meena",
@@ -87,7 +87,7 @@
     "isSecretary": false,
     "isCoordinator": true,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "arpan-gupta": {
     "id": "arpan-gupta",
@@ -102,7 +102,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "rachit-mehta": {
     "id": "rachit-mehta",
@@ -117,7 +117,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "chaitanya-bhoite": {
     "id": "chaitanya-bhoite",
@@ -131,7 +131,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "raj-modi": {
     "id": "raj-modi",
@@ -146,7 +146,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "siddhesh-umarjee": {
     "id": "siddhesh-umarjee",
@@ -161,7 +161,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "beli": {
     "id": "beli",
@@ -176,7 +176,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "jash-pasad": {
     "id": "jash-pasad",
@@ -191,7 +191,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "akul-gupta": {
     "id": "akul-gupta",
@@ -206,7 +206,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "indrayudh-mandal": {
     "id": "indrayudh-mandal",
@@ -221,7 +221,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "piyush-makhijani": {
     "id": "piyush-makhijani",
@@ -236,7 +236,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "satvik-kadian": {
     "id": "satvik-kadian",
@@ -251,7 +251,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "romit-mohane": {
     "id": "romit-mohane",
@@ -266,7 +266,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "akshit-chhabra": {
     "id": "akshit-chhabra",
@@ -281,7 +281,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "vishal-boliwal": {
     "id": "vishal-boliwal",
@@ -296,7 +296,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "dhru-harsh": {
     "id": "dhru-harsh",
@@ -311,7 +311,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "srushti-dandekar": {
     "id": "srushti-dandekar",
@@ -326,7 +326,7 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   },
   "harshal-rana": {
     "id": "harshal-rana",
@@ -340,6 +340,6 @@
     "isSecretary": false,
     "isCoordinator": false,
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-02T19:48:09.636Z"
+    "updatedAt": "2025-06-08T00:33:29.470Z"
   }
 }

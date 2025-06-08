@@ -26,15 +26,10 @@
         "name": "Advait",
         "role": "Secretary",
         "email": "advait@iitgn.ac.in"
-      },
-      {
-        "name": "Priya Singh",
-        "role": "General Member",
-        "email": "priya.singh@iitgn.ac.in"
       }
     ],
     "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-06-01T20:33:48.629Z",
+    "updatedAt": "2025-06-05T17:10:52.702Z",
     "logoPath": ""
   },
   "digis": {

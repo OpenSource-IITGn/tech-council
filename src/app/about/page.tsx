@@ -41,8 +41,8 @@ export default async function AboutPage() {
       {/* About Tech Team Section */}
       <section className="py-16 bg-muted/50">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            <div className="space-y-6">
+          <div className="grid gap-8 md:gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+            <div className="space-y-6 order-1 lg:order-1">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-space-grotesk">
                 About Tech Team
               </h2>
@@ -64,7 +64,7 @@ export default async function AboutPage() {
                 </p>
               </div>
             </div>
-            <div className="relative flex justify-center items-center overflow-visible min-h-[600px]">
+            <div className="relative flex justify-center items-center overflow-visible min-h-[600px] hidden lg:block order-2 lg:order-2">
               <TechCube3D />
             </div>
           </div>
@@ -129,31 +129,31 @@ export default async function AboutPage() {
               {/* Technical Secretary - Featured Position */}
               {secretary && (
                 <div className="flex justify-center">
-                  <div className="glass rounded-2xl p-8 text-center transition-all duration-300 hover:scale-105">
-                    <div className="relative mb-6">
+                  <div className="glass rounded-2xl p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:scale-105 max-w-sm sm:max-w-md md:max-w-lg">
+                    <div className="relative mb-4 sm:mb-6">
                       {secretary.photoPath ? (
                         <Image
                           src={secretary.photoPath}
                           alt={secretary.name}
                           width={300}
                           height={300}
-                          className="w-[300px] h-[300px] object-cover rounded-xl"
+                          className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] object-cover rounded-xl mx-auto"
                         />
                       ) : (
-                        <div className={`w-[300px] h-[300px] rounded-xl bg-gradient-to-r ${secretary.gradientFrom} ${secretary.gradientTo} flex items-center justify-center text-white font-bold text-6xl`}>
+                        <div className={`w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] rounded-xl bg-gradient-to-r ${secretary.gradientFrom} ${secretary.gradientTo} flex items-center justify-center text-white font-bold text-4xl sm:text-5xl md:text-6xl mx-auto`}>
                           {secretary.initials}
                         </div>
                       )}
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600/30 to-purple-600/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                     </div>
-                    <h3 className="font-bold text-2xl mb-2 font-space-grotesk">{secretary.name}</h3>
-                    <p className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-4">{secretary.position}</p>
-                    <div className="space-y-3">
+                    <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-2 font-space-grotesk">{secretary.name}</h3>
+                    <p className="text-sm sm:text-base md:text-lg font-semibold text-blue-600 dark:text-blue-400 mb-3 sm:mb-4">{secretary.position}</p>
+                    <div className="space-y-2 sm:space-y-3">
                       <a
                         href={`mailto:${secretary.email}`}
-                        className="inline-flex items-center text-sm text-muted-foreground hover:text-blue-600 transition-colors duration-200 bg-blue-50 dark:bg-blue-950/30 px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/50"
+                        className="inline-flex items-center text-xs sm:text-sm text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-blue-50 dark:bg-blue-950/30 px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/50 break-all max-w-full"
                       >
-                        {secretary.email}
+                        <span className="truncate">{secretary.email}</span>
                       </a>
                     </div>
                   </div>
@@ -161,7 +161,7 @@ export default async function AboutPage() {
               )}
 
               {/* Coordinators Grid */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 w-full max-w-7xl">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full max-w-7xl mx-auto">
                 {coordinators.map((coordinator, index) => {
                   // Define color schemes for coordinators
                   const colorSchemes = [
@@ -174,33 +174,33 @@ export default async function AboutPage() {
                   const colorScheme = colorSchemes[index % colorSchemes.length];
 
                   return (
-                    <div key={coordinator.id} className="glass rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105">
-                      <div className="relative mb-6">
+                    <div key={coordinator.id} className="glass rounded-2xl p-3 sm:p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
+                      <div className="relative mb-3 sm:mb-4 lg:mb-6">
                         {coordinator.photoPath ? (
                           <Image
                             src={coordinator.photoPath}
                             alt={coordinator.name}
                             width={200}
                             height={200}
-                            className="w-[200px] h-[200px] object-cover rounded-xl"
+                            className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] object-cover rounded-xl mx-auto"
                           />
                         ) : (
-                          <div className={`w-[200px] h-[200px] rounded-xl bg-gradient-to-r ${coordinator.gradientFrom} ${coordinator.gradientTo} flex items-center justify-center text-white font-bold text-3xl mx-auto`}>
+                          <div className={`w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] rounded-xl bg-gradient-to-r ${coordinator.gradientFrom} ${coordinator.gradientTo} flex items-center justify-center text-white font-bold text-xl sm:text-2xl md:text-2xl lg:text-3xl mx-auto`}>
                             {coordinator.initials}
                           </div>
                         )}
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                       </div>
-                      <h3 className="font-bold text-lg mb-1 font-space-grotesk">{coordinator.name}</h3>
-                      <p className={`text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-3`}>
+                      <h3 className="font-bold text-xs sm:text-sm md:text-base lg:text-lg mb-1 font-space-grotesk">{coordinator.name}</h3>
+                      <p className={`text-xs sm:text-xs md:text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-2 sm:mb-3`}>
                         {coordinator.position}
                       </p>
-                      <div className="space-y-2">
+                      <div className="space-y-1 sm:space-y-2">
                         <a
                           href={`mailto:${coordinator.email}`}
-                          className={`inline-flex items-center text-xs text-muted-foreground hover:text-${colorScheme.hover} transition-colors duration-200 bg-${colorScheme.bg}-50 dark:bg-${colorScheme.bg}-950/30 px-3 py-2 rounded-lg hover:bg-${colorScheme.bg}-100 dark:hover:bg-${colorScheme.bg}-950/50`}
+                          className="inline-flex items-center text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50 px-2 sm:px-3 py-1 sm:py-1.5 lg:py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
                         >
-                          {coordinator.email}
+                          <span className="truncate">{coordinator.email}</span>
                         </a>
                       </div>
                     </div>

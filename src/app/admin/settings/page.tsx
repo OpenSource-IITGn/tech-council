@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Settings as SettingsIcon, 
+import {
+  Settings as SettingsIcon,
   Save,
   RefreshCw,
   Shield,
@@ -23,7 +23,14 @@ import {
   Palette,
   Download,
   Upload,
-  Trash2
+  Trash2,
+  MapPin,
+  Mail,
+  Phone,
+  Instagram,
+  Youtube,
+  Linkedin,
+  Facebook
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -33,12 +40,19 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({
     siteName: "Tech@IITGN",
     siteDescription: "Technical Council - IIT Gandhinagar",
-    adminEmails: ["mukul.meena@iitgn.ac.in", "technical.secretary@iitgn.ac.in"],
     enableNotifications: true,
     autoBackup: true,
     maintenanceMode: false,
     maxFileSize: "10MB",
     allowedFileTypes: ["jpg", "jpeg", "png", "gif", "webp"]
+  });
+
+  const [adminEmails, setAdminEmails] = useState({
+    emails: ["mukul.meena@iitgn.ac.in", "technical.secretary@iitgn.ac.in"],
+    lastModified: "",
+    modifiedBy: "",
+    createdAt: "",
+    updatedAt: ""
   });
 
   const [siteSettings, setSiteSettings] = useState({
@@ -52,6 +66,26 @@ export default function SettingsPage() {
     lastUpdated: ""
   });
 
+  const [contactInfo, setContactInfo] = useState({
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: ""
+    },
+    phone: "",
+    email: "",
+    socialMedia: {
+      instagram: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    },
+    lastModified: "",
+    modifiedBy: ""
+  });
+
   useEffect(() => {
     if (status === "loading") return;
 
@@ -63,6 +97,8 @@ export default function SettingsPage() {
     // Fetch site settings
     fetchSiteSettings();
     fetchBlobSettings();
+    fetchContactInfo();
+    fetchAdminEmails();
   }, [session, status, router]);
 
   const fetchSiteSettings = async () => {
@@ -86,6 +122,30 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error("Error fetching blob settings:", error);
+    }
+  };
+
+  const fetchContactInfo = async () => {
+    try {
+      const response = await fetch("/api/admin/contact-info");
+      if (response.ok) {
+        const data = await response.json();
+        setContactInfo(data);
+      }
+    } catch (error) {
+      console.error("Error fetching contact info:", error);
+    }
+  };
+
+  const fetchAdminEmails = async () => {
+    try {
+      const response = await fetch("/api/admin/admin-emails");
+      if (response.ok) {
+        const data = await response.json();
+        setAdminEmails(data);
+      }
+    } catch (error) {
+      console.error("Error fetching admin emails:", error);
     }
   };
 
@@ -169,6 +229,103 @@ export default function SettingsPage() {
     } catch (error) {
       console.error("Error resetting blob color:", error);
       alert("Failed to reset blob color. Please try again.");
+    }
+  };
+
+  const handleContactInfoUpdate = async () => {
+    try {
+      const response = await fetch("/api/admin/contact-info", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ contactInfo }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setContactInfo(result.contactInfo);
+        alert("Contact information updated successfully!");
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to update contact information");
+      }
+    } catch (error) {
+      console.error("Error updating contact info:", error);
+      alert("Failed to update contact information. Please try again.");
+    }
+  };
+
+  const handleContactInfoReset = async () => {
+    try {
+      const response = await fetch("/api/admin/contact-info", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setContactInfo(result.contactInfo);
+        alert("Contact information reset to default successfully!");
+      } else {
+        throw new Error("Failed to reset contact information");
+      }
+    } catch (error) {
+      console.error("Error resetting contact info:", error);
+      alert("Failed to reset contact information. Please try again.");
+    }
+  };
+
+  const handleAddAdminEmail = async () => {
+    const email = prompt("Enter admin email:");
+    if (!email || !email.includes("@")) {
+      if (email) alert("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/admin-emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAdminEmails(result.data);
+        alert("Admin email added successfully!");
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to add admin email");
+      }
+    } catch (error) {
+      console.error("Error adding admin email:", error);
+      alert(`Failed to add admin email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleRemoveAdminEmail = async (email: string) => {
+    if (!confirm(`Are you sure you want to remove "${email}" from admin access?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/admin-emails?email=${encodeURIComponent(email)}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAdminEmails(result.data);
+        alert("Admin email removed successfully!");
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to remove admin email");
+      }
+    } catch (error) {
+      console.error("Error removing admin email:", error);
+      alert(`Failed to remove admin email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -331,7 +488,7 @@ export default function SettingsPage() {
               <div>
                 <Label>Authorized Admin Emails</Label>
                 <div className="space-y-2 mt-2">
-                  {settings.adminEmails.map((email, index) => (
+                  {adminEmails.emails.map((email, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <Badge variant="outline" className="flex-1 justify-start">
                         {email}
@@ -339,10 +496,9 @@ export default function SettingsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          const newEmails = settings.adminEmails.filter((_, i) => i !== index);
-                          setSettings(prev => ({ ...prev, adminEmails: newEmails }));
-                        }}
+                        onClick={() => handleRemoveAdminEmail(email)}
+                        disabled={adminEmails.emails.length <= 1}
+                        title={adminEmails.emails.length <= 1 ? "Cannot remove the last admin email" : "Remove admin email"}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -353,18 +509,15 @@ export default function SettingsPage() {
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  onClick={() => {
-                    const email = prompt("Enter admin email:");
-                    if (email && email.includes("@")) {
-                      setSettings(prev => ({ 
-                        ...prev, 
-                        adminEmails: [...prev.adminEmails, email] 
-                      }));
-                    }
-                  }}
+                  onClick={handleAddAdminEmail}
                 >
                   Add Email
                 </Button>
+                {adminEmails.lastModified && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Last modified by {adminEmails.modifiedBy} on {new Date(adminEmails.lastModified).toLocaleString()}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
@@ -483,6 +636,172 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Information */}
+          <Card className="glass lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Contact Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Address Section */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Address</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="street">Street Address</Label>
+                    <Input
+                      id="street"
+                      value={contactInfo.address.street}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        address: { ...prev.address, street: e.target.value }
+                      }))}
+                      placeholder="323, Acad Block 4, IIT Gandhinagar"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={contactInfo.address.city}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        address: { ...prev.address, city: e.target.value }
+                      }))}
+                      placeholder="Palaj, Gandhinagar"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      value={contactInfo.address.state}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        address: { ...prev.address, state: e.target.value }
+                      }))}
+                      placeholder="Gujarat"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="postalCode">Postal Code</Label>
+                    <Input
+                      id="postalCode"
+                      value={contactInfo.address.postalCode}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        address: { ...prev.address, postalCode: e.target.value }
+                      }))}
+                      placeholder="382355"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Details */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Contact Details</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      value={contactInfo.phone}
+                      onChange={(e) => setContactInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="+91-79-2395-2001"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={contactInfo.email}
+                      onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="technical.secretary@iitgn.ac.in"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Social Media</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="instagram">Instagram URL</Label>
+                    <Input
+                      id="instagram"
+                      value={contactInfo.socialMedia.instagram}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, instagram: e.target.value }
+                      }))}
+                      placeholder="https://www.instagram.com/tech_iitgn"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="youtube">YouTube URL</Label>
+                    <Input
+                      id="youtube"
+                      value={contactInfo.socialMedia.youtube}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, youtube: e.target.value }
+                      }))}
+                      placeholder="https://www.youtube.com/@tech_iitgn"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="linkedin">LinkedIn URL</Label>
+                    <Input
+                      id="linkedin"
+                      value={contactInfo.socialMedia.linkedin}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
+                      }))}
+                      placeholder="https://www.linkedin.com/school/tech-council-iitgn/"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="facebook">Facebook URL</Label>
+                    <Input
+                      id="facebook"
+                      value={contactInfo.socialMedia.facebook}
+                      onChange={(e) => setContactInfo(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, facebook: e.target.value }
+                      }))}
+                      placeholder="https://www.facebook.com/tech.iitgn"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button onClick={handleContactInfoUpdate} className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Update Contact Info
+                </Button>
+                <Button variant="outline" onClick={handleContactInfoReset}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Reset to Default
+                </Button>
+              </div>
+
+              {/* Last Modified Info */}
+              {contactInfo.lastModified && (
+                <div className="text-xs text-muted-foreground pt-2 border-t">
+                  Last updated by {contactInfo.modifiedBy} on {new Date(contactInfo.lastModified).toLocaleString()}
+                </div>
+              )}
             </CardContent>
           </Card>
 

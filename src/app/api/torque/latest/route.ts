@@ -20,7 +20,8 @@ export async function GET() {
       articles: latestMagazine.articles,
       featured: latestMagazine.featured,
       downloadUrl: latestMagazine.filePath,
-      viewUrl: latestMagazine.filePath
+      viewUrl: latestMagazine.filePath,
+      coverPhoto: latestMagazine.coverPhoto
     };
 
     return NextResponse.json(publicMagazine);

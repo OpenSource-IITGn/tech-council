@@ -6,6 +6,7 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const TORQUE_FILE = path.join(DATA_DIR, 'torque.json');
 const TORQUE_STATS_FILE = path.join(DATA_DIR, 'torque-stats.json');
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'torque', 'magazines');
+const COVERS_DIR = path.join(process.cwd(), 'public', 'torque', 'covers');
 
 // Ensure data directory exists
 async function ensureDataDir() {
@@ -22,6 +23,15 @@ async function ensureUploadsDir() {
     await fs.access(UPLOADS_DIR);
   } catch {
     await fs.mkdir(UPLOADS_DIR, { recursive: true });
+  }
+}
+
+// Ensure covers directory exists
+async function ensureCoversDir() {
+  try {
+    await fs.access(COVERS_DIR);
+  } catch {
+    await fs.mkdir(COVERS_DIR, { recursive: true });
   }
 }
 
@@ -186,9 +196,10 @@ export async function getMagazinesForDisplay(): Promise<Array<{
   featured: string;
   downloadUrl: string;
   viewUrl: string;
+  coverPhoto?: string;
 }>> {
   const magazines = await getAllMagazines();
-  
+
   return Object.values(magazines)
     .sort((a, b) => parseInt(b.year) - parseInt(a.year))
     .map(magazine => ({
@@ -200,7 +211,8 @@ export async function getMagazinesForDisplay(): Promise<Array<{
       articles: magazine.articles,
       featured: magazine.featured,
       downloadUrl: magazine.filePath,
-      viewUrl: magazine.filePath
+      viewUrl: magazine.filePath,
+      coverPhoto: magazine.coverPhoto
     }));
 }
 
@@ -226,5 +238,53 @@ export async function updateTorqueStats(stats: TorqueStats): Promise<void> {
   } catch (error) {
     console.error('Error saving torque stats:', error);
     throw new Error('Failed to save torque stats');
+  }
+}
+
+// Save uploaded file
+export async function saveUploadedFile(file: File, magazineId: string): Promise<string> {
+  await ensureUploadsDir();
+
+  const fileName = `${magazineId}.pdf`;
+  const filePath = path.join(UPLOADS_DIR, fileName);
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await fs.writeFile(filePath, buffer);
+
+  return `/torque/magazines/${fileName}`;
+}
+
+// Save uploaded cover photo
+export async function saveCoverPhoto(file: File, magazineId: string): Promise<{ filePath: string; fileName: string }> {
+  await ensureCoversDir();
+
+  const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const fileName = `${magazineId}-cover.${fileExtension}`;
+  const filePath = path.join(COVERS_DIR, fileName);
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await fs.writeFile(filePath, buffer);
+
+  return {
+    filePath: `/torque/covers/${fileName}`,
+    fileName: file.name
+  };
+}
+
+// Delete cover photo
+export async function deleteCoverPhoto(magazineId: string): Promise<void> {
+  const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+  for (const ext of extensions) {
+    const fileName = `${magazineId}-cover.${ext}`;
+    const filePath = path.join(COVERS_DIR, fileName);
+
+    try {
+      await fs.access(filePath);
+      await fs.unlink(filePath);
+      break; // File found and deleted, exit loop
+    } catch {
+      // File doesn't exist, continue to next extension
+    }
   }
 }

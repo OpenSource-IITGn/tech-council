@@ -9,11 +9,19 @@ const createEventSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
+  location: z.string().optional().default("IITGN Campus"),
+  duration: z.string().optional().default("1 day"),
+  participants: z.string().optional().default("50+"),
+  organizer: z.string().optional().default("Technical Council"),
   category: z.string().min(1, "Category is required"),
-  location: z.string().optional().default(""),
-  organizingBody: z.string().optional().default("Technical Council"),
-  draft: z.boolean().optional().default(false),
-  gallery: z.array(z.string()).default([])
+  highlights: z.array(z.string()).default([]),
+  gallery: z.array(z.object({
+    id: z.string(),
+    url: z.string(),
+    alt: z.string(),
+    caption: z.string().optional()
+  })).default([]),
+  draft: z.boolean().optional().default(false)
 });
 
 // Check if user is admin
@@ -69,22 +77,17 @@ export async function POST(request: NextRequest) {
       title: validatedData.title,
       description: validatedData.description,
       date: validatedData.date,
-      location: validatedData.location || "IITGN Campus",
-      duration: "1 day", // Default value
-      participants: "50+", // Default value
-      organizer: validatedData.organizingBody || "Technical Council",
+      location: validatedData.location,
+      duration: validatedData.duration,
+      participants: validatedData.participants,
+      organizer: validatedData.organizer,
       category: validatedData.category,
-      highlights: [
+      highlights: validatedData.highlights.length > 0 ? validatedData.highlights : [
         "Engaging sessions and activities",
         "Learning opportunities",
         "Networking with peers"
-      ], // Default highlights
-      gallery: validatedData.gallery.map((url, index) => ({
-        id: (index + 1).toString(),
-        url: url,
-        alt: `${validatedData.title} - Image ${index + 1}`,
-        caption: `Photo from ${validatedData.title}`
-      }))
+      ],
+      gallery: validatedData.gallery
     };
 
     // Create event

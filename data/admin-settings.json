@@ -1,10 +1,6 @@
 {
   "siteName": "Tech@IITGN",
   "siteDescription": "Technical Council - IIT Gandhinagar",
-  "adminEmails": [
-    "mukul.meena@iitgn.ac.in",
-    "technical.secretary@iitgn.ac.in"
-  ],
   "enableNotifications": true,
   "autoBackup": true,
   "maintenanceMode": false,

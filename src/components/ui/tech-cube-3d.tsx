@@ -126,7 +126,7 @@ void main() {
 }
 `;
 
-const Blob = ({ color }: { color: string }) => {
+const Blob = ({ color, scale = 1 }: { color: string; scale?: number }) => {
   const mesh = useRef<THREE.Mesh>(null);
   const hover = useRef(false);
   const isHovering = useRef(false);
@@ -167,7 +167,7 @@ const Blob = ({ color }: { color: string }) => {
   return (
     <mesh
       ref={mesh}
-      scale={1.8} // Reduced from 2.2 to 1.8 for better proportions in larger container
+      scale={1.8 * scale} // Apply responsive scale
       position={[0, 0, 0]}
       onPointerOver={() => {
         hover.current = true;
@@ -190,8 +190,17 @@ const Blob = ({ color }: { color: string }) => {
 
 export function TechCube3D() {
   const [blobColor, setBlobColor] = useState('#06b6d4'); // Default cyan-teal
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     // Fetch blob settings on component mount
     const fetchBlobSettings = async () => {
       try {
@@ -209,11 +218,20 @@ export function TechCube3D() {
 
     // Set up polling to check for color changes every 5 seconds
     const interval = setInterval(fetchBlobSettings, 5000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
+  // Don't render on mobile devices
+  if (isMobile) {
+    return null;
+  }
+
   return (
-    <div className="w-full h-[500px] min-h-[500px] flex justify-center items-center relative overflow-visible">
+    <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] flex justify-center items-center relative overflow-visible">
       <Canvas
         camera={{ position: [0.0, 0.0, 8.0] }}
         style={{
@@ -228,7 +246,7 @@ export function TechCube3D() {
       >
         <planeGeometry args={[0.026, 0.5]} />
         <Environment preset="studio" environmentIntensity={0.5} />
-        <Blob color={blobColor} />
+        <Blob color={blobColor} scale={1} />
         <Environment
           files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
           resolution={1024}

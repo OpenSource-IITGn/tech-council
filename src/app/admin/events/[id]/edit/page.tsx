@@ -14,6 +14,14 @@ import { Switch } from "@/components/ui/switch";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Event, eventCategories, organizingBodies } from "@/lib/events-data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 interface PageProps {
   params: Promise<{
@@ -341,5 +349,263 @@ export default function EditEvent({ params }: PageProps) {
                       />
                     </div>
                   </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor="organizer">Organizer *</Label>
+                      <Select
+                        value={formData.organizer}
+                        onValueChange={(value) => handleInputChange("organizer", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select organizer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {organizingBodies.map((body) => (
+                            <SelectItem key={body} value={body}>
+                              {body}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="category">Category *</Label>
+                      <Select
+                        value={formData.category}
+                        onValueChange={(value) => handleInputChange("category", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {eventCategories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
+
+              {/* Highlights Section */}
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Event Highlights</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    {formData.highlights.map((highlight, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={highlight}
+                          onChange={(e) => {
+                            const newHighlights = [...formData.highlights];
+                            newHighlights[index] = e.target.value;
+                            handleInputChange("highlights", newHighlights);
+                          }}
+                          placeholder="Enter highlight"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeHighlight(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newHighlight}
+                      onChange={(e) => setNewHighlight(e.target.value)}
+                      placeholder="Add new highlight"
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addHighlight();
+                        }
+                      }}
+                    />
+                    <Button type="button" onClick={addHighlight}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Gallery Section */}
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Event Gallery</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-6">
+                    {formData.gallery.map((item, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Image {index + 1}</h4>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeGalleryItem(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <ImageUpload
+                          label="Gallery Image"
+                          currentImageUrl={item.url}
+                          onImageUploaded={(url) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].url = url;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          onImageRemoved={() => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].url = "";
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          showAltText={true}
+                          altText={item.alt}
+                          onAltTextChange={(altText) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].alt = altText;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          showCaption={true}
+                          caption={item.caption || ""}
+                          onCaptionChange={(caption) => {
+                            const newGallery = [...formData.gallery];
+                            newGallery[index].caption = caption;
+                            handleInputChange("gallery", newGallery);
+                          }}
+                          required={true}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 space-y-4">
+                    <h4 className="font-medium">Add New Image</h4>
+                    <ImageUpload
+                      label="Upload New Gallery Image"
+                      currentImageUrl={newGalleryItem.url}
+                      onImageUploaded={(url) => setNewGalleryItem(prev => ({ ...prev, url }))}
+                      onImageRemoved={() => setNewGalleryItem(prev => ({ ...prev, url: "" }))}
+                      showAltText={true}
+                      altText={newGalleryItem.alt}
+                      onAltTextChange={(altText) => setNewGalleryItem(prev => ({ ...prev, alt: altText }))}
+                      showCaption={true}
+                      caption={newGalleryItem.caption}
+                      onCaptionChange={(caption) => setNewGalleryItem(prev => ({ ...prev, caption }))}
+                      required={true}
+                    />
+                    <Button
+                      type="button"
+                      onClick={addGalleryItem}
+                      disabled={!newGalleryItem.url || !newGalleryItem.alt}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Image
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Event Status</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="draft">Draft Mode</Label>
+                    <Switch
+                      id="draft"
+                      checked={formData.draft}
+                      onCheckedChange={(checked) => handleInputChange("draft", checked)}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {formData.draft
+                      ? "Event is in draft mode and not visible to public"
+                      : "Event is published and visible to public"
+                    }
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Event Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Event ID:</span>
+                    <span className="font-mono">{eventId}</span>
+                  </div>
+                  {event && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Created:</span>
+                        <span>{new Date(event.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Updated:</span>
+                        <span>{new Date(event.updatedAt).toLocaleDateString()}</span>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle>Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <LoadingSpinner className="mr-2 h-4 w-4" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => router.push("/admin/events")}
+                  >
+                    Cancel
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </form>
+      </div>
+    </AdminLayout>
+  );
+}

@@ -225,21 +225,31 @@ export default function EditHackathonPage({ params }: EditHackathonPageProps) {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => router.push("/admin/hackathons")}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Hackathons
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold font-space-grotesk">
-              Edit Hackathon
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Update hackathon details and information
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/admin/hackathons")}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Hackathons
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold font-space-grotesk">
+                Edit Hackathon
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">
+                Update hackathon details and information
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => window.open(`/hackathons/${hackathonId}`, '_blank')}
+            >
+              View Public Page
+            </Button>
           </div>
         </div>
 

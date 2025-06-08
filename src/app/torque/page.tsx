@@ -14,6 +14,7 @@ interface TorqueMagazine {
   featured: string;
   downloadUrl: string;
   viewUrl: string;
+  coverPhoto?: string;
 }
 
 interface TorqueStats {
@@ -238,19 +239,47 @@ export default function TorquePage() {
               </div>
 
               <div className="relative">
-                <div className="aspect-[3/4] rounded-lg bg-gradient-to-br from-orange-600 to-red-600 p-8 text-white shadow-2xl">
-                  <div className="flex h-full flex-col justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-2">TORQUE</h3>
-                      <p className="text-orange-100">{latestMagazine.year} Edition</p>
+                <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden relative">
+                  {latestMagazine.coverPhoto ? (
+                    <>
+                      {/* Cover Photo Background */}
+                      <div
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                        style={{ backgroundImage: `url(${latestMagazine.coverPhoto})` }}
+                      />
+                      {/* Overlay for text readability */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/30 to-black/70" />
+                      {/* Content */}
+                      <div className="relative h-full p-8 text-white flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2 drop-shadow-lg">TORQUE</h3>
+                          <p className="text-white/90 drop-shadow-md">{latestMagazine.year} Edition</p>
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-semibold mb-2 drop-shadow-lg">{latestMagazine.title}</h4>
+                          <p className="text-sm text-white/90 drop-shadow-md">
+                            The Annual Magazine of Technical Council, IIT Gandhinagar
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Default Orange Background */
+                    <div className="bg-gradient-to-br from-orange-600 to-red-600 p-8 text-white h-full">
+                      <div className="flex h-full flex-col justify-between">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">TORQUE</h3>
+                          <p className="text-orange-100">{latestMagazine.year} Edition</p>
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-semibold mb-2">{latestMagazine.title}</h4>
+                          <p className="text-sm text-orange-100">
+                            The Annual Magazine of Technical Council, IIT Gandhinagar
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-xl font-semibold mb-2">{latestMagazine.title}</h4>
-                      <p className="text-sm text-orange-100">
-                        The Annual Magazine of Technical Council, IIT Gandhinagar
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
                 {/* Floating tech elements */}
                 <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500/20 rounded-lg rotate-12" />
