@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { saveCoverPhoto } from '@/lib/torque-storage';
+import { uploadImageToFirebase } from '@/lib/firebase-storage';
 import { allowedImageTypes, maxImageSize } from '@/lib/torque-data';
 
 export async function POST(request: NextRequest) {
@@ -49,14 +49,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save the cover photo
-    const result = await saveCoverPhoto(file, magazineId);
+    // Generate filename for cover
+    const fileName = `${magazineId}-cover.jpg`;
+
+    // Convert file to buffer
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Upload and optimize cover image using Firebase Storage
+    const result = await uploadImageToFirebase(
+      buffer,
+      fileName,
+      'torque/covers',
+      {
+        maxWidth: 800,
+        maxHeight: 1200,
+        quality: 85,
+        format: 'jpeg'
+      }
+    );
 
     return NextResponse.json({
       success: true,
-      filePath: result.filePath,
-      fileName: result.fileName,
-      fileSize: file.size
+      filePath: result.url,
+      fileName: result.filename,
+      fileSize: result.size
     });
 
   } catch (error) {

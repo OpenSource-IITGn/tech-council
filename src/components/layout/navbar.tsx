@@ -2,13 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo"
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -28,12 +28,11 @@ export function Navbar() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image
-              src="/tech-logo.svg"
-              alt="Tech@IITGN Logo"
-              width={32}
-              height={32}
+            <ThemeAwareLogo
+              width={48}
+              height={48}
               className="h-12 w-12 rounded-full"
+              priority={true}
             />
             <span className="hidden font-bold sm:inline-block font-space-grotesk">
               Technical Council
@@ -69,12 +68,11 @@ export function Navbar() {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <Link href="/" className="flex items-center space-x-2 md:hidden">
-              <Image
-                src="/tech-logo.svg"
-                alt="Tech@IITGN Logo"
+              <ThemeAwareLogo
                 width={32}
                 height={32}
                 className="h-8 w-8 rounded-full"
+                priority={true}
               />
               <span className="font-bold font-space-grotesk">Technical Council</span>
             </Link>

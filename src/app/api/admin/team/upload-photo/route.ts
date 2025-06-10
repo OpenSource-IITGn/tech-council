@@ -1,32 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
-import sharp from "sharp";
+import { uploadImageToFirebase, deleteFromFirebase } from "@/lib/firebase-storage";
 
 // Check if user is admin
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions);
   return session?.user?.isAdmin || false;
-}
-
-// Ensure upload directory exists
-async function ensureTeamPhotoDir() {
-  const uploadDir = path.join(process.cwd(), 'public', 'team');
-  try {
-    await fs.access(uploadDir);
-  } catch {
-    await fs.mkdir(uploadDir, { recursive: true });
-  }
-  return uploadDir;
-}
-
-// Generate filename for team photo
-function generatePhotoFileName(originalName: string, memberId: string): string {
-  const ext = path.extname(originalName).toLowerCase();
-  const timestamp = Date.now();
-  return `${memberId}-${timestamp}${ext}`;
 }
 
 // POST /api/admin/team/upload-photo - Upload team member photo
@@ -68,53 +48,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ensure upload directory exists
-    const uploadDir = await ensureTeamPhotoDir();
-
-    // Generate filename
-    const fileName = generatePhotoFileName(file.name, memberId);
-
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // Determine target size based on role
     const targetSize = isSecretary ? 300 : 200;
 
-    // Process image using Sharp - create square image with proper sizing
-    const processedBuffer = await sharp(buffer)
-      .resize(targetSize, targetSize, {
-        fit: 'cover',
-        position: 'center'
-      })
-      .jpeg({
+    // Generate filename with member ID prefix
+    const fileName = `${memberId}-${Date.now()}.jpg`;
+
+    // Upload and optimize image using Firebase Storage
+    const result = await uploadImageToFirebase(
+      buffer,
+      fileName,
+      'team',
+      {
+        maxWidth: targetSize,
+        maxHeight: targetSize,
         quality: 90,
-        progressive: true
-      })
-      .toBuffer();
-
-    // Remove existing photos for this member (in case of different extensions)
-    const existingFiles = await fs.readdir(uploadDir);
-    const memberFiles = existingFiles.filter(f => f.startsWith(`${memberId}-`));
-    for (const existingFile of memberFiles) {
-      try {
-        await fs.unlink(path.join(uploadDir, existingFile));
-      } catch {
-        // File might not exist, ignore error
+        format: 'jpeg'
       }
-    }
-
-    // Save the processed image
-    const finalFileName = fileName.replace(path.extname(fileName), '.jpg');
-    const finalFilePath = path.join(uploadDir, finalFileName);
-    await fs.writeFile(finalFilePath, processedBuffer);
-
-    // Return the public URL
-    const publicUrl = `/team/${finalFileName}`;
+    );
 
     return NextResponse.json({
-      url: publicUrl,
-      filename: finalFileName,
-      size: processedBuffer.length,
+      url: result.url,
+      filename: result.filename,
+      size: result.size,
       memberId,
       dimensions: `${targetSize}x${targetSize}`
     });
@@ -137,20 +96,16 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const filename = searchParams.get("filename");
+    const filePath = searchParams.get("filePath");
 
-    if (!filename) {
-      return NextResponse.json({ error: "No filename provided" }, { status: 400 });
+    if (!filePath) {
+      return NextResponse.json({ error: "No file path provided" }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'team', filename);
+    // Delete from Firebase Storage
+    await deleteFromFirebase(filePath);
 
-    try {
-      await fs.unlink(filePath);
-      return NextResponse.json({ message: "Photo deleted successfully" });
-    } catch {
-      return NextResponse.json({ error: "Photo not found" }, { status: 404 });
-    }
+    return NextResponse.json({ message: "Photo deleted successfully" });
 
   } catch (error) {
     console.error("Error deleting team photo:", error);

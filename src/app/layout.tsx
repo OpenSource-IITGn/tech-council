@@ -22,15 +22,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Technical Council, IITGN" }],
   icons: {
     icon: [
-      { url: "/tech-logo.svg", type: "image/svg+xml" }
+      { url: "/tech-logo-dark.svg", type: "image/svg+xml" }
     ],
-    apple: "/tech-logo.svg",
+    apple: "/tech-logo-dark.svg",
   },
   openGraph: {
     title: "Technical Council - IIT Gandhinagar",
     description: "Official website of the Technical Council, IIT Gandhinagar",
     type: "website",
-    images: [{ url: "/tech-logo.svg" }],
+    images: [{ url: "/tech-logo-dark.svg" }],
   },
 };
 

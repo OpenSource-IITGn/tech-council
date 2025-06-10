@@ -3,10 +3,10 @@
 import { signIn, getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo";
 
 export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,12 +51,11 @@ export default function AdminLoginPage() {
         <Card className="glass border-0 shadow-2xl">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <Image
-                src="/tech-logo.svg"
-                alt="Tech@IITGN Logo"
+              <ThemeAwareLogo
                 width={64}
                 height={64}
                 className="h-16 w-16 rounded-full"
+                priority={true}
               />
             </div>
             <div>

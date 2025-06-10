@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo";
 import {
   LayoutDashboard,
   Calendar,
@@ -109,9 +110,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
             <Link href="/admin" className="flex items-center space-x-2">
-              <Image
-                src="/tech-logo.svg"
-                alt="Tech@IITGN Logo"
+              <ThemeAwareLogo
                 width={32}
                 height={32}
                 className="h-8 w-8 rounded-full"

@@ -1,33 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
-import sharp from "sharp";
+import { uploadImageToFirebase, deleteFromFirebase } from "@/lib/firebase-storage";
 
 // Check if user is admin
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions);
   return session?.user?.isAdmin || false;
-}
-
-// Ensure upload directory exists
-async function ensureUploadDir(subDir: string = 'events/uploads') {
-  const uploadDir = path.join(process.cwd(), 'public', subDir);
-  try {
-    await fs.access(uploadDir);
-  } catch {
-    await fs.mkdir(uploadDir, { recursive: true });
-  }
-  return uploadDir;
-}
-
-// Generate unique filename
-function generateFileName(originalName: string): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const extension = path.extname(originalName);
-  return `${timestamp}-${randomString}${extension}`;
 }
 
 // POST /api/admin/upload - Upload image
@@ -63,39 +42,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ensure upload directory exists
-    const uploadDir = await ensureUploadDir();
-
-    // Generate unique filename
-    const fileName = generateFileName(file.name);
-
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Optimize image using Sharp
-    const optimizedBuffer = await sharp(buffer)
-      .resize(1200, 1200, {
-        fit: 'inside',
-        withoutEnlargement: true
-      })
-      .jpeg({
+    // Upload and optimize image using Firebase Storage
+    const result = await uploadImageToFirebase(
+      buffer,
+      file.name,
+      'events/uploads',
+      {
+        maxWidth: 1200,
+        maxHeight: 1200,
         quality: 85,
-        progressive: true
-      })
-      .toBuffer();
-
-    // Save optimized image
-    const optimizedFileName = fileName.replace(path.extname(fileName), '.jpg');
-    const optimizedFilePath = path.join(uploadDir, optimizedFileName);
-    await fs.writeFile(optimizedFilePath, optimizedBuffer);
-
-    // Return the public URL
-    const publicUrl = `/events/uploads/${optimizedFileName}`;
+        format: 'jpeg'
+      }
+    );
 
     return NextResponse.json({
-      url: publicUrl,
-      filename: optimizedFileName,
-      size: optimizedBuffer.length
+      url: result.url,
+      filename: result.filename,
+      size: result.size
     });
 
   } catch (error) {
@@ -116,20 +82,16 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const filename = searchParams.get("filename");
+    const filePath = searchParams.get("filePath");
 
-    if (!filename) {
-      return NextResponse.json({ error: "No filename provided" }, { status: 400 });
+    if (!filePath) {
+      return NextResponse.json({ error: "No file path provided" }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'events', 'uploads', filename);
+    // Delete from Firebase Storage
+    await deleteFromFirebase(filePath);
 
-    try {
-      await fs.unlink(filePath);
-      return NextResponse.json({ message: "File deleted successfully" });
-    } catch {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
-    }
+    return NextResponse.json({ message: "File deleted successfully" });
 
   } catch (error) {
     console.error("Error deleting file:", error);

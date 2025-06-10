@@ -1,32 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
-import sharp from "sharp";
+import { uploadImageToFirebase, uploadToFirebase, deleteFromFirebase } from "@/lib/firebase-storage";
 
 // Check if user is admin
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions);
   return session?.user?.isAdmin || false;
-}
-
-// Ensure upload directory exists
-async function ensureLogoDir(type: 'clubs' | 'hobby-groups') {
-  const uploadDir = path.join(process.cwd(), 'public', 'logos', type);
-  try {
-    await fs.access(uploadDir);
-  } catch {
-    await fs.mkdir(uploadDir, { recursive: true });
-  }
-  return uploadDir;
-}
-
-// Generate logo filename
-function generateLogoFileName(clubId: string, originalName: string): string {
-  const ext = path.extname(originalName).toLowerCase();
-  // Use club ID as filename for consistency
-  return `${clubId}${ext}`;
 }
 
 // POST /api/admin/clubs/upload-logo - Upload club/hobby group logo
@@ -72,61 +52,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine upload directory based on club type
+    // Determine folder based on club type
     const logoType = clubType === 'club' ? 'clubs' : 'hobby-groups';
-    const uploadDir = await ensureLogoDir(logoType);
+    const folder = `logos/${logoType}`;
 
-    // Generate filename
-    const fileName = generateLogoFileName(clubId, file.name);
+    // Generate filename with club ID
+    const fileName = `${clubId}.png`;
 
     // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-    let finalBuffer: Buffer = buffer;
-    let finalFileName = fileName;
+    let result;
 
-    // Process image if it's not SVG
-    if (file.type !== "image/svg+xml") {
-      // Optimize image using Sharp
-      finalBuffer = await sharp(buffer)
-        .resize(400, 400, {
-          fit: 'inside',
-          withoutEnlargement: true,
-          background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparent background
-        })
-        .png({
+    // Handle SVG files differently
+    if (file.type === "image/svg+xml") {
+      // Upload SVG directly without processing
+      const svgFileName = `${clubId}.svg`;
+      result = await uploadToFirebase(buffer, svgFileName, file.type, folder);
+    } else {
+      // Upload and optimize image using Firebase Storage
+      result = await uploadImageToFirebase(
+        buffer,
+        fileName,
+        folder,
+        {
+          maxWidth: 400,
+          maxHeight: 400,
           quality: 90,
-          compressionLevel: 6
-        })
-        .toBuffer();
-
-      // Change extension to .png for processed images
-      finalFileName = fileName.replace(path.extname(fileName), '.png');
+          format: 'png'
+        }
+      );
     }
-
-    // Remove existing logo files for this club (in case of different extensions)
-    const existingFiles = await fs.readdir(uploadDir);
-    const clubFiles = existingFiles.filter(f => f.startsWith(`${clubId}.`));
-    for (const existingFile of clubFiles) {
-      try {
-        await fs.unlink(path.join(uploadDir, existingFile));
-      } catch {
-        // File might not exist, ignore error
-      }
-    }
-
-    // Save the new logo
-    const finalFilePath = path.join(uploadDir, finalFileName);
-    await fs.writeFile(finalFilePath, finalBuffer);
-
-    // Return the public URL
-    const publicUrl = `/logos/${logoType}/${finalFileName}`;
 
     return NextResponse.json({
-      url: publicUrl,
-      filename: finalFileName,
-      size: finalBuffer.length,
+      url: result.url,
+      filename: result.filename,
+      size: result.size,
       clubId,
       clubType
     });
@@ -149,29 +110,16 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const clubId = searchParams.get("clubId");
-    const clubType = searchParams.get("clubType");
+    const filePath = searchParams.get("filePath");
 
-    if (!clubId || !clubType) {
-      return NextResponse.json({ error: "Club ID and type are required" }, { status: 400 });
+    if (!filePath) {
+      return NextResponse.json({ error: "File path is required" }, { status: 400 });
     }
 
-    const logoType = clubType === 'club' ? 'clubs' : 'hobby-groups';
-    const uploadDir = path.join(process.cwd(), 'public', 'logos', logoType);
+    // Delete from Firebase Storage
+    await deleteFromFirebase(filePath);
 
-    // Find and delete existing logo files for this club
-    try {
-      const existingFiles = await fs.readdir(uploadDir);
-      const clubFiles = existingFiles.filter(f => f.startsWith(`${clubId}.`));
-
-      for (const file of clubFiles) {
-        await fs.unlink(path.join(uploadDir, file));
-      }
-
-      return NextResponse.json({ message: "Logo deleted successfully" });
-    } catch {
-      return NextResponse.json({ error: "Logo not found" }, { status: 404 });
-    }
+    return NextResponse.json({ message: "Logo deleted successfully" });
 
   } catch (error) {
     console.error("Error deleting logo:", error);

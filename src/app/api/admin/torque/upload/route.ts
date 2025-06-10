@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadToFirebase } from "@/lib/firebase-storage";
 import { allowedFileTypes, maxFileSize } from "@/lib/torque-data";
 
 // Check if user is admin
@@ -47,32 +46,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create upload directory if it doesn't exist
-    const uploadDir = path.join(process.cwd(), "public", "torque", "magazines");
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist
-    }
-
     // Generate unique filename
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `torque-${year}-${timestamp}-${originalName}`;
-    const filePath = path.join(uploadDir, fileName);
 
-    // Save file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
+    // Convert file to buffer
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Return file information
-    const publicPath = `/torque/magazines/${fileName}`;
-    
-    return NextResponse.json({
+    // Upload to Firebase Storage
+    const result = await uploadToFirebase(
+      buffer,
       fileName,
-      filePath: publicPath,
-      fileSize: file.size,
+      file.type,
+      'torque/magazines'
+    );
+
+    return NextResponse.json({
+      fileName: result.filename,
+      filePath: result.url,
+      fileSize: result.size,
       year,
       message: "File uploaded successfully"
     });
