@@ -10,9 +10,9 @@ import { Separator } from "@/components/ui/separator"
 import { getHackathonById } from "@/lib/hackathons-storage"
 
 interface HackathonPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: HackathonPageProps): Promise<Metadata> {

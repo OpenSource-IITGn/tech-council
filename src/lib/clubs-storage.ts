@@ -144,7 +144,7 @@ export async function getClubsForDisplay(): Promise<Array<{
   id: string;
   name: string;
   description: string;
-  type: "club" | "hobby-group";
+  type: "club" | "hobby-group" | "technical-council-group";
   category: string;
   logoPath?: string;
 }>> {

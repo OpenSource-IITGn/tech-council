@@ -3,10 +3,11 @@ import { getInterIITAchievementById } from '@/lib/inter-iit-achievements-storage
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const achievement = await getInterIITAchievementById(params.id);
+    const { id } = await params;
+    const achievement = await getInterIITAchievementById(id);
     
     if (!achievement) {
       return NextResponse.json(

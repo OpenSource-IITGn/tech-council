@@ -3,10 +3,11 @@ import { getInterIITEventById, updateInterIITEvent, deleteInterIITEvent } from '
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const event = await getInterIITEventById(params.id);
+    const { id } = await params;
+    const event = await getInterIITEventById(id);
     
     if (!event) {
       return NextResponse.json(
@@ -57,10 +58,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await deleteInterIITEvent(params.id);
+    const { id } = await params;
+    await deleteInterIITEvent(id);
     return NextResponse.json({ message: 'Inter-IIT event deleted successfully' });
   } catch (error) {
     console.error('Error deleting Inter-IIT event:', error);

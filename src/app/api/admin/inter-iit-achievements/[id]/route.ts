@@ -3,10 +3,11 @@ import { getInterIITAchievementById, updateInterIITAchievement, deleteInterIITAc
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const achievement = await getInterIITAchievementById(params.id);
+    const achievement = await getInterIITAchievementById(id);
     
     if (!achievement) {
       return NextResponse.json(
@@ -27,8 +28,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const body = await request.json();
     
@@ -48,7 +50,7 @@ export async function PUT(
       }
     }
     
-    const updatedAchievement = await updateInterIITAchievement(params.id, body);
+    const updatedAchievement = await updateInterIITAchievement(id, body);
     return NextResponse.json(updatedAchievement);
   } catch (error) {
     console.error('Error updating Inter-IIT achievement:', error);
@@ -61,10 +63,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    await deleteInterIITAchievement(params.id);
+    await deleteInterIITAchievement(id);
     return NextResponse.json({ message: 'Inter-IIT achievement deleted successfully' });
   } catch (error) {
     console.error('Error deleting Inter-IIT achievement:', error);

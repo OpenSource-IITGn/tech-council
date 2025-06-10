@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { LogoUpload } from "@/components/admin/logo-upload";
@@ -19,7 +19,7 @@ interface TeamMember {
   email: string;
 }
 
-export default function NewClubPage() {
+function NewClubPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -102,6 +102,10 @@ export default function NewClubPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    const entityType = formData.type === 'club' ? 'Club' :
+                       formData.type === 'hobby-group' ? 'Hobby Group' :
+                       'Technical Council Group';
 
     try {
       // Validate required fields
@@ -462,5 +466,13 @@ export default function NewClubPage() {
         </form>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function NewClubPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewClubPageContent />
+    </Suspense>
   );
 }

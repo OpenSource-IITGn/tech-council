@@ -3,28 +3,41 @@ import { initializeApp, getApps, cert, ServiceAccount } from 'firebase-admin/app
 import { getStorage } from 'firebase-admin/storage';
 
 // Parse the service account key from environment variable
-const getServiceAccount = (): ServiceAccount => {
+const getServiceAccount = (): ServiceAccount | null => {
   const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  
-  if (!serviceAccountKey) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set');
+
+  if (!serviceAccountKey || serviceAccountKey.includes('placeholder')) {
+    console.warn('Firebase service account not configured. Some features may not work.');
+    return null;
   }
 
   try {
     return JSON.parse(serviceAccountKey) as ServiceAccount;
   } catch (error) {
-    throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT_KEY format. Must be valid JSON.');
+    console.warn('Invalid FIREBASE_SERVICE_ACCOUNT_KEY format. Some features may not work.');
+    return null;
   }
 };
 
 // Initialize Firebase Admin (singleton pattern)
+let adminStorage: any = null;
+let bucket: any = null;
+
 if (getApps().length === 0) {
-  initializeApp({
-    credential: cert(getServiceAccount()),
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  });
+  const serviceAccount = getServiceAccount();
+  if (serviceAccount) {
+    try {
+      initializeApp({
+        credential: cert(serviceAccount),
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      });
+      adminStorage = getStorage();
+      bucket = adminStorage.bucket();
+    } catch (error) {
+      console.warn('Failed to initialize Firebase Admin:', error);
+    }
+  }
 }
 
-// Export storage instance
-export const adminStorage = getStorage();
-export const bucket = adminStorage.bucket();
+// Export storage instance (may be null if not configured)
+export { adminStorage, bucket };

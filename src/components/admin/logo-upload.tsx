@@ -8,7 +8,7 @@ import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface LogoUploadProps {
   clubId: string;
-  clubType: "club" | "hobby-group";
+  clubType: "club" | "hobby-group" | "technical-council-group";
   currentLogoUrl?: string;
   onLogoUploaded: (logoUrl: string) => void;
   onLogoRemoved: () => void;

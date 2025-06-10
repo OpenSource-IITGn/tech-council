@@ -71,8 +71,16 @@ export async function PUT(
     // Validate request body
     const validatedData = updateMagazineSchema.parse(body);
 
+    // Filter out null values and convert to undefined for optional fields
+    const cleanedData = Object.fromEntries(
+      Object.entries(validatedData).map(([key, value]) => [
+        key,
+        value === null ? undefined : value
+      ])
+    );
+
     // Update magazine
-    const updatedMagazine = await updateMagazine(resolvedParams.id, validatedData);
+    const updatedMagazine = await updateMagazine(resolvedParams.id, cleanedData);
 
     if (!updatedMagazine) {
       return NextResponse.json({ error: "Magazine not found" }, { status: 404 });

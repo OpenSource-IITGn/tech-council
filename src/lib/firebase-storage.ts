@@ -38,6 +38,10 @@ export async function uploadToFirebase(
   contentType: string,
   folder: string = 'uploads'
 ): Promise<UploadResult> {
+  if (!bucket) {
+    throw new Error('Firebase Storage is not configured. Please set up Firebase credentials.');
+  }
+
   try {
     const filePath = `${folder}/${fileName}`;
     const file = bucket.file(filePath);
@@ -128,6 +132,11 @@ export async function uploadImageToFirebase(
 
 // Delete file from Firebase Storage
 export async function deleteFromFirebase(filePath: string): Promise<void> {
+  if (!bucket) {
+    console.warn('Firebase Storage is not configured. Cannot delete file.');
+    return;
+  }
+
   try {
     const file = bucket.file(filePath);
     await file.delete();
@@ -140,6 +149,11 @@ export async function deleteFromFirebase(filePath: string): Promise<void> {
 
 // Check if file exists in Firebase Storage
 export async function fileExistsInFirebase(filePath: string): Promise<boolean> {
+  if (!bucket) {
+    console.warn('Firebase Storage is not configured. Cannot check file existence.');
+    return false;
+  }
+
   try {
     const file = bucket.file(filePath);
     const [exists] = await file.exists();
@@ -152,6 +166,11 @@ export async function fileExistsInFirebase(filePath: string): Promise<boolean> {
 
 // Get file metadata from Firebase Storage
 export async function getFileMetadata(filePath: string) {
+  if (!bucket) {
+    console.warn('Firebase Storage is not configured. Cannot get file metadata.');
+    return null;
+  }
+
   try {
     const file = bucket.file(filePath);
     const [metadata] = await file.getMetadata();

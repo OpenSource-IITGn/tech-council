@@ -162,8 +162,11 @@ export default function NewEvent() {
       description: "This is a test event created from the admin panel",
       date: "2024-01-15",
       category: "Workshop",
-      organizingBody: "Technical Council",
       location: "IITGN Campus",
+      duration: "3 days",
+      participants: "100+",
+      organizer: "Technical Council",
+      highlights: ["Great speakers", "Hands-on workshops", "Networking opportunities"],
       draft: false,
       gallery: []
     });
@@ -176,8 +179,11 @@ export default function NewEvent() {
         description: "This is a test event created directly via API",
         date: "2024-01-15",
         category: "Workshop",
-        organizingBody: "Technical Council",
         location: "IITGN Campus",
+        duration: "3 days",
+        participants: "100+",
+        organizer: "Technical Council",
+        highlights: ["Great speakers", "Hands-on workshops", "Networking opportunities"],
         draft: false,
         gallery: []
       };
