@@ -23,20 +23,28 @@ const getServiceAccount = (): ServiceAccount | null => {
 let adminStorage: any = null;
 let bucket: any = null;
 
-if (getApps().length === 0) {
-  const serviceAccount = getServiceAccount();
-  if (serviceAccount) {
-    try {
-      initializeApp({
-        credential: cert(serviceAccount),
-        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      });
-      adminStorage = getStorage();
-      bucket = adminStorage.bucket();
-    } catch (error) {
-      console.warn('Failed to initialize Firebase Admin:', error);
+try {
+  if (getApps().length === 0) {
+    const serviceAccount = getServiceAccount();
+    if (serviceAccount && process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) {
+      try {
+        initializeApp({
+          credential: cert(serviceAccount),
+          storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        });
+        adminStorage = getStorage();
+        bucket = adminStorage.bucket();
+      } catch (error) {
+        console.warn('Failed to initialize Firebase Admin:', error);
+      }
     }
+  } else {
+    // Use existing app
+    adminStorage = getStorage();
+    bucket = adminStorage.bucket();
   }
+} catch (error) {
+  console.warn('Firebase Admin initialization error:', error);
 }
 
 // Export storage instance (may be null if not configured)
