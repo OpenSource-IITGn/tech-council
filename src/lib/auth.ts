@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { getAdminEmails } from "./admin-emails-storage";
+import { auth as adminAuth } from "./firebase-admin";
 
 // Get admin emails dynamically from storage
 async function getAuthorizedEmails(): Promise<string[]> {
@@ -19,41 +20,61 @@ async function getAuthorizedEmails(): Promise<string[]> {
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    CredentialsProvider({
+      name: "Firebase",
+      credentials: {
+        idToken: { label: "Firebase ID Token", type: "text" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.idToken) {
+          return null;
+        }
+
+        try {
+          const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
+          const { email, name, picture } = decodedToken;
+
+          if (!email) {
+            return null;
+          }
+
+          const authorizedEmails = await getAuthorizedEmails();
+          if (!authorizedEmails.includes(email)) {
+            return null;
+          }
+
+          return {
+            id: decodedToken.uid,
+            email,
+            name,
+            image: picture,
+            isAdmin: true,
+          };
+        } catch (error) {
+          console.error("Firebase token verification failed:", error);
+          return null;
+        }
+      },
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      // Check if user email is in the admin list
-      const authorizedEmails = await getAuthorizedEmails();
-      if (user.email && authorizedEmails.includes(user.email)) {
-        return true;
-      }
-
-      // Reject sign-in for non-admin users
-      return false;
-    },
-    async session({ session }) {
-      // Add admin flag to session
-      const authorizedEmails = await getAuthorizedEmails();
-      if (session.user?.email && authorizedEmails.includes(session.user.email)) {
-        session.user.isAdmin = true;
-      }
-      return session;
-    },
     async jwt({ token, user }) {
-      // Add admin flag to token
-      const authorizedEmails = await getAuthorizedEmails();
-      if (user?.email && authorizedEmails.includes(user.email)) {
-        token.isAdmin = true;
+      if (user) {
+        token.uid = user.id;
+        token.isAdmin = user.isAdmin;
       }
       return token;
     },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.uid as string;
+        session.user.isAdmin = token.isAdmin as boolean;
+      }
+      return session;
+    },
   },
   pages: {
-    signIn: "/api/auth/signin",
+    signIn: "/admin/login",
     error: "/admin/error",
   },
   session: {
@@ -65,6 +86,7 @@ export const authOptions: NextAuthOptions = {
 declare module "next-auth" {
   interface Session {
     user: {
+      id?: string;
       email?: string | null;
       name?: string | null;
       image?: string | null;
@@ -73,12 +95,14 @@ declare module "next-auth" {
   }
 
   interface User {
+    id: string;
     isAdmin?: boolean;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
+    uid?: string;
     isAdmin?: boolean;
   }
 }
